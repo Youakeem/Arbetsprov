@@ -10,11 +10,11 @@
 </head>
 <body>
     <main>
-        <form class="suggestionsSearch">
-            <input class="searchBar" type="text" name="keyword" placeholder="Search for a movie">
+        <form role="search" class="suggestionsSearch">
+            <input class="searchBar" type="text" name="keyword" placeholder="Search for a movie" autocomplete="off" role="combobox" aria-autocomplete="list" aria-haspopup="false">
         </form>
 
-        <ul class="suggestionsContainer"></ul>
+        <ul class="suggestionsContainer" role="listbox"></ul>
     </main>
 </body>
 </html>

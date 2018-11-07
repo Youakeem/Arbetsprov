@@ -9,15 +9,26 @@ function suggestionsSearch() {
 
 	let clearResults = true;
 
+	function handleProps(state) {
+		if (state === "open") {
+			searchInput.setAttribute("aria-haspopup", true);
+		} else {
+			searchInput.setAttribute("aria-haspopup", false);
+		}
+	}
+
 	function renderSuggestions(suggestions) {
 		if (clearResults) {
+			handleProps("close");
 			suggestionsContainer.innerHTML = "";
 			return;
 		}
 
+		handleProps("open");
 		suggestionsContainer.innerHTML = "";
 		suggestions.forEach((suggestion) => {
 			const suggestionOption = document.createElement("li");
+			suggestionOption.role = "option";
 			suggestionOption.innerHTML = suggestion.title;
 			suggestionsContainer.appendChild(suggestionOption);
 		});
