@@ -1,4 +1,5 @@
 import axios from "axios";
+import throttle from "lodash/throttle";
 import config from "./config";
 import "./main.scss";
 
@@ -7,50 +8,21 @@ function suggestionsSearch() {
 	const searchInput = document.querySelector(".searchBar");
 	const suggestionsContainer = document.querySelector(".suggestionsContainer");
 
-	let clearResults = true;
+	let shouldClearResults = true;
 
-	function handleProps(state) {
-		if (state === "open") {
-			searchInput.setAttribute("aria-haspopup", true);
-		} else {
-			searchInput.setAttribute("aria-haspopup", false);
-		}
-	}
+	form.addEventListener("submit", (event) => event.preventDefault());
+	searchInput.addEventListener("input", throttle(handleSearchInput, 500));
 
-	function renderSuggestions(suggestions) {
-		if (clearResults) {
-			handleProps("close");
-			suggestionsContainer.innerHTML = "";
-			return;
-		}
-
-		handleProps("open");
-		suggestionsContainer.innerHTML = "";
-		suggestions.forEach((suggestion) => {
-			const suggestionOption = document.createElement("li");
-			suggestionOption.role = "option";
-			suggestionOption.innerHTML = suggestion.title;
-			suggestionsContainer.appendChild(suggestionOption);
-		});
-	}
-
-	form.addEventListener("submit", (event) => {
-		event.preventDefault();
-	});
-
-	searchInput.addEventListener("input", (event) => {
+	function handleSearchInput(event) {
 		const { value: keyword } = event.target;
 
-		// We got nothing - Abort
 		if (keyword.length < 1) {
-			clearResults = true;
+			shouldClearResults = true;
 			renderSuggestions();
 			return;
 		}
 
-		// It seems someone is searching - keep doing what you are doing
-		clearResults = false;
-
+		shouldClearResults = false;
 		axios
 			.get(`https://api.themoviedb.org/3/search/movie?language=en-US&page=1&include_adult=false`, {
 				params: {
@@ -65,7 +37,33 @@ function suggestionsSearch() {
 			.catch((error) => {
 				console.log(error);
 			});
-	});
+	}
+
+	function renderSuggestions(suggestions) {
+		if (shouldClearResults) {
+			handleProps();
+			suggestionsContainer.innerHTML = "";
+			return;
+		}
+
+		handleProps("hasPopup");
+
+		suggestionsContainer.innerHTML = "";
+		suggestions.forEach((suggestion) => {
+			const suggestionOption = document.createElement("li");
+			suggestionOption.role = "option";
+			suggestionOption.innerHTML = suggestion.title;
+			suggestionsContainer.appendChild(suggestionOption);
+		});
+	}
+
+	function handleProps(state) {
+		if (state === "hasPopup") {
+			searchInput.setAttribute("aria-haspopup", true);
+		} else {
+			searchInput.setAttribute("aria-haspopup", false);
+		}
+	}
 }
 
 // On Document Ready

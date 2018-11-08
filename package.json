@@ -25,6 +25,7 @@
 		"axios": "^0.18.0",
 		"config.js": "^0.1.0",
 		"config.json": "^0.0.4",
+		"lodash": "^4.17.11",
 		"parcel-bundler": "^1.10.3",
 		"sass": "^1.14.3"
 	}
