@@ -161,12 +161,12 @@ header .logo img {
 }
 
 .searchHistory .historyItem {
-    margin-bottom: 12px;
+    margin-bottom: 6px;
 }
 
 @media screen and (min-width: 768px) {
     .searchHistory .historyItem {
-        margin-top: 0;
+        margin-bottom: 0;
     }
 }
 
