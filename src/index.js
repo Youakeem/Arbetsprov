@@ -157,8 +157,8 @@ var suggestionsSearch = {
 		var dateAndTime =
 			currentDate.getFullYear() +
 			"-" +
-			currentDate.getMonth() +
-			"" +
+			(currentDate.getMonth() + 1) +
+			"-" +
 			currentDate.getDate() +
 			" " +
 			currentDate.getHours() +
