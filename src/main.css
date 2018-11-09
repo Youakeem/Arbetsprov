@@ -1,0 +1,257 @@
+/* General */
+html {
+    height: 100%;
+    box-sizing: border-box;
+    -webkit-text-size-adjust: 100%;
+}
+
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+/* Chrome, Firefox, Opera, Safari 10.1+ */
+::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+    opacity: 1; /* Firefox */
+}
+
+/* Internet Explorer 10-11 */
+:-ms-input-placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Microsoft Edge */
+::-ms-input-placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.sr-only {
+    position: absolute;
+    left: -9999px;
+}
+
+.hidden {
+    opacity: 0;
+}
+
+body {
+    min-height: 100%;
+    font-family: 'Work Sans', sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    padding: 1px;
+    margin: 0;
+    background: rgb(1, 38, 80);
+    background: -moz-linear-gradient(top, rgb(1, 38, 80) 0%, rgb(58, 87, 166) 100%);
+    background: -webkit-linear-gradient(top, rgb(1, 38, 80) 0%, rgb(58, 87, 166) 100%);
+    background: linear-gradient(to bottom, rgb(1, 38, 80) 0%, rgb(58, 87, 166) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#012650', endColorstr='#3a57a6', GradientType=0);
+    background-attachment: fixed;
+}
+
+input[type="text"] {
+    padding: 0 24px;
+    height: 48px;
+    border-radius: 5px;
+    border: 0;
+}
+
+input[type="text"]:focus {
+    outline: 0;
+}
+
+/* Header */
+header {
+    margin: 48px 0;
+}
+
+header .logo {
+    text-align: center;
+    margin: 0;
+}
+
+header .logo h1 {
+    margin: 0;
+}
+
+header .logo img {
+    vertical-align: middle;
+}
+
+/* Suggestions Search */
+.suggestionsSearch {
+    max-width: 548px;
+    padding: 0 24px;
+    margin: auto;
+}
+
+.suggestionsSearch .searchBarContainer {
+    position: relative;
+}
+
+.suggestionsSearch .searchBarContainer[aria-expanded=true] .searchBar {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.suggestionsSearch .searchBar {
+    width: 100%;
+    height: 60px;
+    font-size: 18px;
+    color: #fff;
+    background: url("assets/search.svg") rgba(255, 255, 255, 0.5) no-repeat;
+    background-position: 18px center;
+    padding-left: 48px;
+}
+
+.suggestionsSearch .searchBar:focus {
+    background-color: rgba(255, 255, 255, 0.6);
+}
+
+.suggestionsSearch .suggestionsContainer {
+    position: absolute;
+    overflow: hidden;
+    width: 100%;
+    list-style: none;
+    background: #fff;
+    padding: 0;
+    margin-top: 0;
+    border-radius: 5px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    box-shadow: 0 15px 35px rgba(50, 50, 93, 0.1), 0 5px 15px rgba(0, 0, 0, 0.07);
+    z-index: 1;
+}
+
+.suggestionsSearch .suggestionsContainer[aria-expanded=false] {
+    display: none;
+}
+
+.suggestionsSearch .suggestionsContainer li {
+    padding: 12px;
+    cursor: pointer;
+}
+
+.suggestionsSearch .suggestionsContainer li#chosen {
+    background: #3a57a6;
+    color: #fff;
+}
+
+.suggestionsSearch .suggestionsContainer li#chosen:hover {
+    background: #e4ecff;
+    color: inherit;
+}
+
+.suggestionsSearch .suggestionsContainer li:hover {
+    background: #e4ecff;
+}
+
+/* Search History */
+.searchHistory {
+    margin-top: 48px;
+    padding: 24px 0;
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+.searchHistory .historyList {
+    list-style: none;
+    margin: 0 auto;
+    padding: 0;
+}
+
+.searchHistory .historyItem {
+    margin-bottom: 6px;
+}
+
+@media screen and (min-width: 768px) {
+    .searchHistory .historyItem {
+        margin-bottom: 0;
+    }
+}
+
+.searchHistory .historyItem:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.searchHistory .historyItem .inner {
+    position: relative;
+    max-width: 650px;
+    margin: auto;
+    padding: 12px 110px 12px 30px;
+}
+
+@media screen and (min-width: 768px) {
+    .searchHistory .historyItem .inner {
+        padding: 12px 100px 12px 60px;
+    }
+}
+
+.searchHistory .historyItem h6 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: normal;
+}
+
+@media screen and (min-width: 768px) {
+    .searchHistory .historyItem h6 {
+        max-width: 65%;
+        font-size: 20px;
+    }
+}
+
+.searchHistory .historyItem time {
+    display: inline-block;
+    font-size: 14px;
+}
+
+@media screen and (min-width: 768px) {
+    .searchHistory .historyItem time {
+        position: absolute;
+        top: 50%;
+        right: 120px;
+        transform: translateY(-50%);
+        font-size: inherit;
+    }
+}
+
+.searchHistory .historyItem button {
+    position: absolute;
+    background: #793A53;
+    cursor: pointer;
+    width: 100px;
+    border: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+}
+
+@media screen and (min-width: 768px) {
+    .searchHistory .historyItem button {
+        opacity: 0;
+    }
+}
+
+.searchHistory .historyItem button:focus {
+    outline: 0;
+    opacity: 1;
+}
+
+.searchHistory .historyItem button:active {
+    background: #662d44;
+}
+
+.searchHistory .historyItem button span {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+    line-height: 24px;
+    border-radius: 50%;
+    background: #fff;
+}
+
+.searchHistory .historyItem:hover button {
+    opacity: 1;
+}
