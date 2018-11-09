@@ -1,3 +1,13 @@
+// Debounce - Used for the api calls
+function debounce(func, wait) {
+	var timeout;
+	return function(...args) {
+		var context = this;
+		clearTimeout(timeout);
+		timeout = setTimeout(() => func.apply(context, args), wait);
+	};
+}
+
 var suggestionsSearch = {
 	init: function init() {
 		this.form = document.querySelector(".suggestionsSearch");
@@ -8,7 +18,7 @@ var suggestionsSearch = {
 		this.historyListContainer = document.querySelector(".searchHistory");
 		this.historyList = document.querySelector(".historyList");
 
-		this.throttledGetSuggestions = _.debounce(this.getSuggestions, 250);
+		this.throttledGetSuggestions = debounce(this.getSuggestions, 250);
 
 		this.prevQuery = "";
 		this.selectedResult = 1;
