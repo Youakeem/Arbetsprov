@@ -120,21 +120,36 @@ var suggestionsSearch = {
 
 	getSuggestions: function getSuggestions(keyword) {
 		this.shouldClearResults = false;
+		var request = new XMLHttpRequest();
+		var self = this;
 
-		axios
-			.get(`https://api.themoviedb.org/3/search/movie?language=en-US&page=1&include_adult=false`, {
-				params: {
-					api_key: this.config.api_key,
-					query: keyword
-				}
-			})
-			.then((response) => {
-				var suggestions = response.data.results.slice(0, this.config.suggestionsLimit);
-				this.renderSuggestions(suggestions);
-			})
-			.catch((error) => {
-				console.log(error);
-			});
+		request.open(
+			"GET",
+			"https://api.themoviedb.org/3/search/movie?api_key=" +
+				this.config.api_key +
+				"&query=" +
+				keyword +
+				"&language=en-US&page=1&include_adult=false",
+			true
+		);
+
+		request.onload = function() {
+			if (request.status >= 200 && request.status < 400) {
+				// Success!
+				var data = JSON.parse(request.responseText);
+				var suggestions = data.results.slice(0, self.config.suggestionsLimit);
+				self.renderSuggestions(suggestions);
+			} else {
+				// We reached our target server, but it returned an error
+				console.log("API Error!");
+			}
+		};
+
+		request.onerror = function() {
+			console.log("Request Failed!");
+		};
+
+		request.send();
 
 		this.prevQuery = keyword;
 	},
