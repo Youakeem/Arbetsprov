@@ -23,17 +23,27 @@ html {
     color: rgba(255, 255, 255, 0.7);
 }
 
+.sr-only {
+    position: absolute;
+    left: -9999px;
+}
+
+.hidden {
+    opacity: 0;
+}
+
 body {
     min-height: 100%;
     font-family: 'Work Sans', sans-serif;
     font-size: 16px;
     line-height: 1.5;
-    padding: 24px 24px 0;
+    padding: 24px 0 0;
     background: rgb(1, 38, 80);
     background: -moz-linear-gradient(top, rgb(1, 38, 80) 0%, rgb(58, 87, 166) 100%);
     background: -webkit-linear-gradient(top, rgb(1, 38, 80) 0%, rgb(58, 87, 166) 100%);
     background: linear-gradient(to bottom, rgb(1, 38, 80) 0%, rgb(58, 87, 166) 100%);
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#012650', endColorstr='#3a57a6', GradientType=0);
+    background-attachment: fixed;
 }
 
 input[type="text"] {

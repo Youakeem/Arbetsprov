@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,17 +9,50 @@
     <link href="https://fonts.googleapis.com/css?family=Work+Sans:400,700" rel="stylesheet">
     <script src="index.js"></script>
 </head>
+
 <body>
     <header>
-        <div class="logo">
-            <img src="./assets/logo.svg" alt="">
-        </div>
+        <figure class="logo">
+            <img src="./assets/logo.svg" alt="SearQ Logo">
+        </figure>
     </header>
     <main>
-        <form role="search" class="suggestionsSearch">
-            <input class="searchBar" type="text" name="keyword" placeholder="Search for a movie" autocomplete="off" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-owns="suggestionsListbox">
-            <ul id="suggestionsListbox" class="suggestionsContainer" role="listbox"></ul>
-        </form>
+        <section>
+            <form role="search" class="suggestionsSearch" autocomplete="off">
+                <div
+                    class="searchBarContainer"
+                    role="combobox"
+                    aria-haspopup="listbox"
+                    aria-owns="suggestionsListbox"
+                    aria-expanded="false"
+                >
+                    <input
+                        class="searchBar"
+                        type="text"
+                        placeholder="Search for a movie"
+                        title="Search for a movie"
+                        aria-autocomplete="list"
+                        aria-controls="suggestionsListbox"
+                        aria-activedescendant
+                    >
+
+                    <ul
+                        id="suggestionsListbox"
+                        class="suggestionsContainer"
+                        role="listbox"
+                    >
+                    </ul>
+                </div>
+
+                <p class="resultsNotifications sr-only" aria-live="polite"></p>
+            </form>
+        </section>
+
+        <section class="searchHistory hidden">
+            <ul class="historyList" aria-label="Suggestions History List">
+            </ul>
+        </section>
     </main>
 </body>
+
 </html>

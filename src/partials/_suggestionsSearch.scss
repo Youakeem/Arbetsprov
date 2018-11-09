@@ -1,7 +1,18 @@
 .suggestionsSearch {
-    position: relative;
-    max-width: 500px;
+    max-width: 548px;
+    padding: 0 24px;
     margin: auto;
+
+    .searchBarContainer {
+        position: relative;
+
+        &[aria-expanded="true"] {
+            .searchBar {
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
+            }
+        }
+    }
 
     .searchBar {
         width: 100%;
@@ -15,15 +26,11 @@
         &:focus {
             background-color: rgba(255, 255, 255, 0.6);
         }
-
-        &[aria-expanded="true"] {
-            border-bottom-left-radius: 0;
-            border-bottom-right-radius: 0;
-        }
     }
 
     .suggestionsContainer {
         position: absolute;
+        overflow: hidden;
         width: 100%;
         list-style: none;
         background: #fff;
@@ -33,15 +40,22 @@
         border-top-left-radius: 0;
         border-top-right-radius: 0;
         box-shadow: 0 15px 35px rgba(50, 50, 93, 0.1), 0 5px 15px rgba(0, 0, 0, 0.07);
+        z-index: 1;
+
+        &[aria-expanded="false"] {
+            display: none;
+        }
 
         li {
             padding: 12px;
+            cursor: pointer;
 
-            &.chosen {
+            &#chosen {
                 background: rgb(58, 87, 166);
                 color: #fff;
 
                 &:hover {
+                    background: rgb(228, 236, 255);
                     color: inherit;
                 }
             }
