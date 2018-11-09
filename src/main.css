@@ -439,7 +439,7 @@ header .logo {
     height: 60px;
     font-size: 18px;
     color: #fff;
-    background: url("../src/assets/search.svg") rgba(255, 255, 255, 0.5) no-repeat;
+    background: url("assets/search.svg") rgba(255, 255, 255, 0.5) no-repeat;
     background-position: 18px center;
     padding-left: 48px;
 }
