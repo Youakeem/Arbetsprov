@@ -1,52 +1,54 @@
-import axios from "axios";
-import debounce from "lodash/debounce";
-import config from "./config";
-import "./main.scss";
+var suggestionsSearch = {
+	init: function init() {
+		this.form = document.querySelector(".suggestionsSearch");
+		this.searchBar = document.querySelector(".searchBar");
+		this.searchBarContainer = document.querySelector(".searchBarContainer");
+		this.suggestionsContainer = document.querySelector(".suggestionsContainer");
+		this.resultsNotifications = document.querySelector(".resultsNotifications");
+		this.historyListContainer = document.querySelector(".searchHistory");
+		this.historyList = document.querySelector(".historyList");
 
-function suggestionsSearch() {
-	const form = document.querySelector(".suggestionsSearch");
-	const searchBar = document.querySelector(".searchBar");
-	const searchBarContainer = document.querySelector(".searchBarContainer");
-	const suggestionsContainer = document.querySelector(".suggestionsContainer");
-	const resultsNotifications = document.querySelector(".resultsNotifications");
-	const historyListContainer = document.querySelector(".searchHistory");
-	const historyList = document.querySelector(".historyList");
+		this.throttledGetSuggestions = _.debounce(this.getSuggestions, 250);
 
-	const throttledGetSuggestions = debounce(getSuggestions, 250);
+		this.prevQuery = "";
+		this.selectedResult = 1;
+		this.shouldClearResults = true;
+		this.historyEntries = [];
+		this.config = {
+			api_key: "49ae8291afdec560abe77eb8be0c5a6a",
+			suggestionsLimit: 5
+		};
 
-	let prevQuery = "";
-	let selectedResult = 1;
-	let shouldClearResults = true;
-	let historyEntries = [];
+		this.registerEventListeners();
 
-	// Automatically focus on search field on page load
-	searchBar.focus();
+		this.searchBar.focus();
+	},
 
-	// Event handlers
-	form.addEventListener("submit", (event) => event.preventDefault());
-	searchBar.addEventListener("blur", () => clearSuggestions());
-	searchBar.addEventListener("keyup", handleSearchInput);
-	searchBar.addEventListener("keydown", handleSuggestionsSelect);
-	historyList.addEventListener("click", removeHistoryEntry);
-	suggestionsContainer.addEventListener("mousedown", handleSuggestionClick);
+	registerEventListeners: function registerEventListeners() {
+		this.form.addEventListener("submit", (event) => event.preventDefault());
+		this.searchBar.addEventListener("blur", () => this.clearSuggestions.call(this));
+		this.searchBar.addEventListener("keyup", this.handleSearchInput.bind(this));
+		this.searchBar.addEventListener("keydown", this.handleSuggestionsSelect.bind(this));
+		this.historyList.addEventListener("click", this.removeHistoryEntry.bind(this));
+		this.suggestionsContainer.addEventListener("mousedown", this.handleSuggestionClick.bind(this));
+	},
 
-	function handleSearchInput(event) {
-		const { value: keyword } = event.target;
+	handleSearchInput: function handleSearchInput(event) {
+		var keyword = event.target.value;
 
-		// If input is empty, clear the suggestions menu
 		if (keyword.length < 1) {
-			clearSuggestions();
+			this.clearSuggestions();
 			return;
 		}
 
-		// // Call the API
-		if (keyword.trim() !== prevQuery.trim()) {
-			throttledGetSuggestions(keyword);
+		if (keyword.trim() !== this.prevQuery.trim()) {
+			this.throttledGetSuggestions(keyword);
 		}
-	}
+	},
 
-	function handleSuggestionsSelect(event) {
-		const keyCode = event.which || event.keyCode;
+	handleSuggestionsSelect: function handleSuggestionsSelect(event) {
+		var keyCode = event.which || event.keyCode;
+		var suggestiosCount = this.suggestionsContainer.children.length;
 
 		if (keyCode === 38 || keyCode === 40 || keyCode === 27 || keyCode === 13) {
 			event.preventDefault();
@@ -54,138 +56,149 @@ function suggestionsSearch() {
 
 		// ArrowDown
 		if (keyCode === 40) {
-			if (selectedResult < suggestionsContainer.children.length) {
-				selectedResult++;
+			if (this.selectedResult < suggestiosCount) {
+				this.selectedResult++;
 			} else {
-				selectedResult = 1;
+				this.selectedResult = 1;
 			}
 		}
 
 		// ArrowUp
 		if (keyCode === 38) {
-			if (selectedResult > 1) {
-				selectedResult--;
+			if (this.selectedResult > 1) {
+				this.selectedResult--;
 			} else {
-				selectedResult = suggestionsContainer.children.length;
+				this.selectedResult = suggestiosCount;
 			}
 		}
 
 		// ESC
-		if (keyCode === 27 && suggestionsContainer.children.length) {
-			clearSuggestions();
+		if (keyCode === 27 && suggestiosCount) {
+			this.clearSuggestions();
 		}
 
 		// Enter
 		if (keyCode === 13) {
-			const results = [ ...suggestionsContainer.children ];
-			const selected = results[getResultIndex()];
+			var results = [].slice.call(this.suggestionsContainer.children);
 
-			addHistoryEntry(selected.textContent);
-			clearSuggestions(true);
+			if (!results.length) {
+				return;
+			}
+
+			var selected = results[this.getResultIndex()];
+
+			this.addHistoryEntry(selected.textContent);
+			this.clearSuggestions(true);
 		}
 
-		highlightSelectedResult();
-	}
+		this.highlightSelectedResult();
+	},
 
-	// Private functions
-	function handleSuggestionClick(event) {
-		addHistoryEntry(event.target.innerHTML);
-	}
+	handleSuggestionClick: function handleSuggestionClick(event) {
+		this.addHistoryEntry(event.target.innerHTML);
+	},
 
-	function addHistoryEntry(entryTitle) {
-		const currentDate = new Date();
-		const dateAndTime = `${currentDate.getFullYear()}-${currentDate.getMonth() +
-			1}-${currentDate.getDate()} ${currentDate.getHours()}:${currentDate.getMinutes()}`;
-
-		const suggestion = {
-			title: entryTitle,
-			date: dateAndTime
-		};
-
-		const entryIndex = historyEntries.map((entry) => entry.title).indexOf(entryTitle);
-
-		if (entryIndex < 0) {
-			historyEntries.push(suggestion);
-			renderHistory();
+	clearSuggestions: function clearSuggestions(shouldClearInput) {
+		if (shouldClearInput) {
+			this.searchBar.value = "";
 		}
-	}
 
-	function removeHistoryEntry(event) {
-		let button = event.target.closest("button");
-		if (!button) return;
+		this.shouldClearResults = true;
+		this.renderSuggestions();
+		this.notifyScreenReaders(0);
+	},
 
-		const suggestionTitle = [].find.call(button.parentNode.children, (child) => child.nodeName === "H6");
-
-		const newEntries = historyEntries.filter((entry) => entry.title !== suggestionTitle.innerHTML);
-
-		historyEntries = newEntries;
-		renderHistory();
-	}
-
-	function getSuggestions(keyword) {
-		shouldClearResults = false;
+	getSuggestions: function getSuggestions(keyword) {
+		this.shouldClearResults = false;
 
 		axios
 			.get(`https://api.themoviedb.org/3/search/movie?language=en-US&page=1&include_adult=false`, {
 				params: {
-					api_key: config.api_key,
+					api_key: this.config.api_key,
 					query: keyword
 				}
 			})
 			.then((response) => {
-				const suggestions = response.data.results.slice(0, config.suggestionsLimit);
-				renderSuggestions(suggestions);
+				var suggestions = response.data.results.slice(0, this.config.suggestionsLimit);
+				this.renderSuggestions(suggestions);
 			})
 			.catch((error) => {
 				console.log(error);
 			});
 
-		// Set previous query to the current keyword
-		prevQuery = keyword;
-	}
+		this.prevQuery = keyword;
+	},
 
-	function renderSuggestions(suggestions) {
-		// If no suggestions
-		if (shouldClearResults) {
-			handleProps();
-			selectedResult = 1;
-			suggestionsContainer.innerHTML = "";
+	renderSuggestions: function renderSuggestions(suggestions) {
+		if (this.shouldClearResults) {
+			this.handleProps();
+			this.selectedResult = 1;
+			this.suggestionsContainer.innerHTML = "";
 			return;
 		}
 
-		// If there are suggestions - toggle elements props
-		handleProps(true);
+		this.handleProps(true);
+		this.selectedResult = 1;
 
-		// Set selected result to the first option
-		selectedResult = 1;
-
-		// Rebuild suggestions list
-		suggestionsContainer.innerHTML = "";
+		this.suggestionsContainer.innerHTML = "";
 		suggestions.forEach((suggestion) => {
-			const suggestionOption = document.createElement("li");
+			var suggestionOption = document.createElement("li");
 			suggestionOption.setAttribute("role", "option");
 			suggestionOption.innerHTML = suggestion.title;
-			suggestionsContainer.appendChild(suggestionOption);
+			this.suggestionsContainer.appendChild(suggestionOption);
 		});
 
-		// Highlight selected result
-		highlightSelectedResult();
+		this.highlightSelectedResult();
+		this.notifyScreenReaders(suggestions.length);
+	},
 
-		// Notify screen readers with the change
-		notifyScreenReaders(suggestions.length);
-	}
+	addHistoryEntry: function addHistoryEntry(entryTitle) {
+		var currentDate = new Date();
+		var dateAndTime =
+			currentDate.getFullYear() +
+			"-" +
+			currentDate.getMonth() +
+			"" +
+			currentDate.getDate() +
+			" " +
+			currentDate.getHours() +
+			":" +
+			currentDate.getMinutes();
 
-	function renderHistory() {
-		// Rebuild history list
-		if (!historyEntries.length) {
-			historyListContainer.classList.add("hidden");
+		var suggestion = {
+			title: entryTitle,
+			date: dateAndTime
+		};
+
+		const entryIndex = this.historyEntries.map((entry) => entry.title).indexOf(entryTitle);
+
+		if (entryIndex < 0) {
+			this.historyEntries.push(suggestion);
+			this.renderHistory();
+		}
+	},
+
+	removeHistoryEntry: function removeHistoryEntry(event) {
+		var button = event.target.closest("button");
+		if (!button) return;
+
+		var suggestionTitle = [].find.call(button.parentNode.children, (child) => child.nodeName === "H6");
+		var newEntries = this.historyEntries.filter((entry) => entry.title !== suggestionTitle.innerHTML);
+
+		this.historyEntries = newEntries;
+		this.renderHistory();
+	},
+
+	renderHistory: function renderHistory() {
+		if (!this.historyEntries.length) {
+			this.historyListContainer.classList.add("hidden");
 		} else {
-			historyListContainer.classList.remove("hidden");
+			this.historyListContainer.classList.remove("hidden");
 		}
 
-		historyList.innerHTML = "";
-		historyEntries.forEach((entry) => {
-			const element = document.createElement("li");
+		this.historyList.innerHTML = "";
+		this.historyEntries.forEach((entry) => {
+			var element = document.createElement("li");
 			element.classList.add("historyItem");
 
 			element.innerHTML =
@@ -197,49 +210,25 @@ function suggestionsSearch() {
 				entry.title +
 				"history entry'><span>X</span></button>";
 
-			historyList.appendChild(element);
+			this.historyList.appendChild(element);
 		});
-	}
+	},
 
-	function clearSuggestions(shouldClearInput) {
-		shouldClearResults = true;
-
-		if (shouldClearInput) {
-			searchBar.value = "";
-		}
-
-		renderSuggestions();
-		notifyScreenReaders(0);
-	}
-
-	function notifyScreenReaders(suggestionsCount) {
-		if (suggestionsCount) {
-			resultsNotifications.innerHTML = `You have ${suggestionsCount} suggestions. Use the UP and DOWN keys to navigate them.`;
-			return;
-		}
-
-		resultsNotifications.innerHTML = "";
-	}
-
-	function handleProps(expanded) {
+	handleProps: function handleProps(expanded) {
 		if (expanded) {
-			searchBarContainer.setAttribute("aria-haspopup", true);
-			searchBarContainer.setAttribute("aria-expanded", true);
-			suggestionsContainer.setAttribute("aria-expanded", true);
+			this.searchBarContainer.setAttribute("aria-haspopup", true);
+			this.searchBarContainer.setAttribute("aria-expanded", true);
+			this.suggestionsContainer.setAttribute("aria-expanded", true);
 		} else {
-			searchBarContainer.setAttribute("aria-haspopup", false);
-			searchBarContainer.setAttribute("aria-expanded", false);
-			suggestionsContainer.setAttribute("aria-expanded", false);
+			this.searchBarContainer.setAttribute("aria-haspopup", false);
+			this.searchBarContainer.setAttribute("aria-expanded", false);
+			this.suggestionsContainer.setAttribute("aria-expanded", false);
 		}
-	}
+	},
 
-	function getResultIndex() {
-		return selectedResult > 0 ? selectedResult - 1 : selectedResult;
-	}
-
-	function highlightSelectedResult() {
-		const results = [ ...suggestionsContainer.children ];
-		const selected = results[getResultIndex()];
+	highlightSelectedResult: function highlightSelectedResult() {
+		var results = [].slice.call(this.suggestionsContainer.children);
+		var selected = results[this.getResultIndex()];
 
 		if (results.length) {
 			for (let result of results) {
@@ -247,16 +236,30 @@ function suggestionsSearch() {
 				result.setAttribute("aria-selected", false);
 			}
 
-			searchBar.setAttribute("aria-activedescendant", "chosen");
+			this.searchBar.setAttribute("aria-activedescendant", "chosen");
 			selected.setAttribute("id", "chosen");
 			selected.setAttribute("aria-selected", true);
 		}
+	},
+
+	notifyScreenReaders: function notifyScreenReaders(suggestionsCount) {
+		if (suggestionsCount) {
+			this.resultsNotifications.innerHTML =
+				"You have " + suggestionsCount + " suggestions. Use the UP and DOWN keys to navigate them.";
+			return;
+		}
+
+		this.resultsNotifications.innerHTML = "";
+	},
+
+	getResultIndex: function getResultIndex() {
+		return this.selectedResult > 0 ? this.selectedResult - 1 : this.selectedResult;
 	}
-}
+};
 
 // On Document Ready
 if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
-	suggestionsSearch();
+	suggestionsSearch.init();
 } else {
-	document.addEventListener("DOMContentLoaded", suggestionsSearch);
+	document.addEventListener("DOMContentLoaded", suggestionsSearch.init.bind(suggestionsSearch));
 }
