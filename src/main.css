@@ -195,23 +195,23 @@ header .logo img {
 
 @media screen and (min-width: 768px) {
     .searchHistory .historyItem h6 {
-        font-size: 22px;
+        max-width: 65%;
+        font-size: 20px;
     }
 }
 
 .searchHistory .historyItem time {
     display: inline-block;
+    font-size: 14px;
 }
 
 @media screen and (min-width: 768px) {
-    .searchHistory .historyItem:not(:hover) button:not(:focus):not(:active) {
-        width: 1px;
-        height: 1px;
-        margin: -1px;
-        white-space: nowrap;
-        clip-path: inset(100%);
-        clip: rect(0 0 0 0);
-        overflow: hidden;
+    .searchHistory .historyItem time {
+        position: absolute;
+        top: 50%;
+        right: 120px;
+        transform: translateY(-50%);
+        font-size: inherit;
     }
 }
 
