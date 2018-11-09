@@ -518,7 +518,7 @@ header .logo {
     position: relative;
     max-width: 650px;
     margin: auto;
-    padding: 12px 100px 12px 30px;
+    padding: 12px 110px 12px 30px;
 }
 
 @media screen and (min-width: 768px) {
