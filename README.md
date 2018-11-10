@@ -11,7 +11,7 @@
 This application enable the user to search TMDB (The Movie Data Base) API by title and add movie suggestions to a history/watch list.
 
 ## Technologies
-The application is build with HTML5, CSS3 and ES5 Vanilla JS.
+The application is built with HTML5, CSS3, and ES5 Vanilla JS.
 
 ## Expected Behaviour
 ### Search bar
